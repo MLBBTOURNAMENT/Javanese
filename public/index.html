@@ -1,1 +1,279 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Sinau Basa Jawa - Platform Pembelajaran Bahasa Jawa</title>
+    <link rel="stylesheet" href="styles.css">
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+</head>
+<body>
+    <!-- Login/Register Modal -->
+    <div id="authModal" class="modal">
+        <div class="modal-content">
+            <span class="close">&times;</span>
+            
+            <!-- Login Form -->
+            <div id="loginForm" class="auth-form active">
+                <div class="auth-header">
+                    <h2>Mlebu (Login)</h2>
+                    <p>Sugeng rawuh maneh ing Sinau Basa Jawa</p>
+                </div>
+                
+                <form id="loginFormElement">
+                    <div class="form-group">
+                        <label for="loginEmail">Email</label>
+                        <input type="email" id="loginEmail" required>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label for="loginPassword">Password</label>
+                        <input type="password" id="loginPassword" required>
+                    </div>
+                    
+                    <button type="submit" class="btn-primary">Mlebu</button>
+                </form>
+                
+                <p class="auth-switch">
+                    Durung duwe akun? <a href="#" onclick="switchToRegister()">Daftar kene</a>
+                </p>
+            </div>
+            
+            <!-- Register Form -->
+            <div id="registerForm" class="auth-form">
+                <div class="auth-header">
+                    <h2>Daftar (Register)</h2>
+                    <p>Gabung karo komunitas sinau basa Jawa</p>
+                </div>
+                
+                <form id="registerFormElement">
+                    <div class="form-group">
+                        <label for="registerEmail">Email</label>
+                        <input type="email" id="registerEmail" required>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label for="registerPassword">Password</label>
+                        <input type="password" id="registerPassword" required>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label for="repeatPassword">Ulangi Password</label>
+                        <input type="password" id="repeatPassword" required>
+                    </div>
+                    
+                    <button type="submit" class="btn-primary">Daftar</button>
+                </form>
+                
+                <p class="auth-switch">
+                    Wis duwe akun? <a href="#" onclick="switchToLogin()">Login kene</a>
+                </p>
+            </div>
+        </div>
+    </div>
 
+    <!-- Main Content -->
+    <div id="mainContent" style="display: none;">
+        <header class="header">
+            <div class="container">
+                <div class="nav-brand">
+                    <h1>🏛️ Sinau Basa Jawa</h1>
+                </div>
+                <nav class="nav-menu">
+                    <a href="#" onclick="showPage('aksara')" class="nav-link active">Aksara</a>
+                    <a href="#" onclick="showPage('kamus')" class="nav-link">Kamus Dasar</a>
+                    <a href="#" onclick="showPage('stage')" class="nav-link">Stage</a>
+                    <a href="#" onclick="showPage('tutur')" class="nav-link">Tutur</a>
+                    <div class="user-info">
+                        <span id="userEmail"></span>
+                        <button onclick="logout()" class="btn-logout">Logout</button>
+                    </div>
+                </nav>
+            </div>
+        </header>
+
+        <main class="main-content">
+            <!-- Aksara Page -->
+            <div id="aksaraPage" class="page active">
+                <div class="container">
+                    <h2 class="page-title">Aksara Jawa</h2>
+                    <div class="aksara-grid" id="aksaraGrid">
+                        <!-- Will be populated by JavaScript -->
+                    </div>
+                </div>
+            </div>
+
+            <!-- Kamus Page -->
+            <div id="kamusPage" class="page">
+                <div class="container">
+                    <h2 class="page-title">Kamus Dasar Basa Jawa</h2>
+                    
+                    <!-- Added complete dictionary interface -->
+                    <div class="search-section">
+                        <div class="search-container">
+                            <input type="text" id="dictionarySearch" placeholder="Cari kata dalam bahasa Jawa atau Indonesia..." class="search-input">
+                            <button onclick="searchDictionary()" class="search-btn">🔍</button>
+                        </div>
+                        <div class="search-filters">
+                            <button onclick="filterDictionary('all')" class="filter-btn active" data-filter="all">Semua</button>
+                            <button onclick="filterDictionary('greeting')" class="filter-btn" data-filter="greeting">Salam</button>
+                            <button onclick="filterDictionary('basic')" class="filter-btn" data-filter="basic">Dasar</button>
+                            <button onclick="filterDictionary('family')" class="filter-btn" data-filter="family">Keluarga</button>
+                            <button onclick="filterDictionary('time')" class="filter-btn" data-filter="time">Waktu</button>
+                        </div>
+                    </div>
+                    
+                    <div class="dictionary-grid" id="dictionaryGrid">
+                        <!-- Will be populated by JavaScript -->
+                    </div>
+                </div>
+            </div>
+
+            <!-- Stage Page -->
+            <div id="stagePage" class="page">
+                <div class="container">
+                    <h2 class="page-title">Stage Pembelajaran</h2>
+                    
+                    <!-- Added complete stage system with leaderboard -->
+                    <div class="stage-header">
+                        <div class="user-progress">
+                            <div class="level-info">
+                                <span class="current-level">Level <span id="userLevel">1</span></span>
+                                <span class="user-rank" id="userRank">Bronze 1</span>
+                            </div>
+                            <div class="points-info">
+                                <span class="points">Points: <span id="userPoints">0</span></span>
+                            </div>
+                        </div>
+                        
+                        <div class="leaderboard-toggle">
+                            <button onclick="toggleLeaderboard()" class="btn-secondary">🏆 Leaderboard</button>
+                        </div>
+                    </div>
+                    
+                    <div id="leaderboardSection" class="leaderboard-section" style="display: none;">
+                        <h3>Leaderboard Harian</h3>
+                        <div class="leaderboard-list" id="leaderboardList">
+                            <!-- Will be populated by JavaScript -->
+                        </div>
+                    </div>
+                    
+                    <div class="stages-grid" id="stagesGrid">
+                        <!-- Will be populated by JavaScript -->
+                    </div>
+                    
+                    <!-- Quiz Modal -->
+                    <div id="quizModal" class="modal">
+                        <div class="modal-content quiz-content">
+                            <span class="close" onclick="closeQuiz()">&times;</span>
+                            <div class="quiz-header">
+                                <h3 id="quizTitle">Level 1</h3>
+                                <div class="quiz-progress">
+                                    <span id="questionNumber">1</span> / <span id="totalQuestions">5</span>
+                                </div>
+                            </div>
+                            
+                            <div class="quiz-body">
+                                <div class="question-text" id="questionText"></div>
+                                <div class="options-container" id="optionsContainer">
+                                    <!-- Options will be populated by JavaScript -->
+                                </div>
+                            </div>
+                            
+                            <div class="quiz-footer">
+                                <button id="nextQuestionBtn" onclick="nextQuestion()" class="btn-primary" style="display: none;">Lanjut</button>
+                                <button id="finishQuizBtn" onclick="finishQuiz()" class="btn-primary" style="display: none;">Selesai</button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Tutur Page -->
+            <div id="tuturPage" class="page">
+                <div class="container">
+                    <h2 class="page-title">Tutur (Ngoko ↔ Krama)</h2>
+                    
+                    <!-- Added complete ngoko-krama translator -->
+                    <div class="tutur-explanation">
+                        <div class="explanation-card">
+                            <h3>Apa itu Ngoko dan Krama?</h3>
+                            <div class="explanation-content">
+                                <div class="explanation-item">
+                                    <h4>Ngoko</h4>
+                                    <p>Bahasa Jawa yang digunakan untuk berbicara dengan teman sebaya, orang yang lebih muda, atau dalam situasi informal.</p>
+                                </div>
+                                <div class="explanation-item">
+                                    <h4>Krama</h4>
+                                    <p>Bahasa Jawa halus yang digunakan untuk menghormati orang yang lebih tua, atasan, atau dalam situasi formal.</p>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="tutur-translator">
+                        <div class="translator-controls">
+                            <button onclick="setTuturMode('ngoko-krama')" class="btn-secondary active" id="ngokoKramaBtn">Ngoko → Krama</button>
+                            <button onclick="setTuturMode('krama-ngoko')" class="btn-secondary" id="kramaNgokoBtn">Krama → Ngoko</button>
+                        </div>
+                        
+                        <div class="tutur-input">
+                            <div class="input-section">
+                                <label id="inputLabel">Ngoko (Informal)</label>
+                                <textarea id="tuturInput" placeholder="Ketik kalimat dalam bahasa Ngoko..."></textarea>
+                            </div>
+                            <div class="output-section">
+                                <label id="outputLabel">Krama (Formal)</label>
+                                <textarea id="tuturOutput" readonly placeholder="Hasil terjemahan..."></textarea>
+                            </div>
+                        </div>
+                        
+                        <div class="example-sentences">
+                            <h4>Contoh Kalimat:</h4>
+                            <div class="examples-grid" id="examplesGrid">
+                                <!-- Will be populated by JavaScript -->
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </main>
+    </div>
+
+    <!-- Landing Page -->
+    <div id="landingPage">
+        <div class="hero-section">
+            <div class="container">
+                <div class="hero-content">
+                    <h1 class="hero-title">🏛️ Sinau Basa Jawa</h1>
+                    <p class="hero-subtitle">Platform pembelajaran bahasa Jawa yang lengkap dan interaktif</p>
+                    <p class="hero-description">Pelajari aksara Jawa, kamus dasar, tingkatan tutur, dan asah kemampuan dengan sistem stage yang menyenangkan</p>
+                    
+                    <div class="hero-features">
+                        <div class="feature-item">
+                            <span class="feature-icon">🔤</span>
+                            <span>Aksara Jawa + Audio</span>
+                        </div>
+                        <div class="feature-item">
+                            <span class="feature-icon">📚</span>
+                            <span>Kamus Lengkap</span>
+                        </div>
+                        <div class="feature-item">
+                            <span class="feature-icon">🎮</span>
+                            <span>100 Level Stage</span>
+                        </div>
+                        <div class="feature-item">
+                            <span class="feature-icon">🗣️</span>
+                            <span>Ngoko ↔ Krama</span>
+                        </div>
+                    </div>
+                    
+                    <button onclick="openAuthModal()" class="btn-hero">Mulai Sinau Saiki</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script src="script.js"></script>
+</body>
+</html>

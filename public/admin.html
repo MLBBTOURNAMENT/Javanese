@@ -1,0 +1,314 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Admin Dashboard - Sinau Basa Jawa</title>
+    <link rel="stylesheet" href="/admin-styles.css">
+    <link href="https://fonts.googleapis.com/css2?family=Work+Sans:wght@400;600;700&family=Open+Sans:wght@400;500;600&display=swap" rel="stylesheet">
+</head>
+<body>
+    <!-- Admin Login Modal -->
+    <div id="adminLoginModal" class="modal" style="display: flex;">
+        <div class="modal-content admin-login-content">
+            <div class="login-header">
+                <h2>🔐 Admin Access</h2>
+                <p>Enter admin password to continue</p>
+            </div>
+            
+            <form id="adminLoginForm">
+                <div class="form-group">
+                    <label for="adminPassword">Admin Password</label>
+                    <input type="password" id="adminPassword" placeholder="Enter password (525252)" required autocomplete="current-password" autofocus>
+                </div>
+                
+                <button type="submit" class="btn-primary">Access Dashboard</button>
+            </form>
+            
+            <div class="security-notice">
+                <span class="security-icon">🛡️</span>
+                <span>Secure admin access protected by encryption</span>
+            </div>
+            
+            <div style="margin-top: 1rem; padding: 0.5rem; background: #f0f0f0; border-radius: 4px; font-size: 0.8rem; color: #666;">
+                Debug: Admin login form loaded. Password: 525252
+            </div>
+        </div>
+    </div>
+
+    <!-- Admin Dashboard -->
+    <div id="adminDashboard" style="display: none;">
+        <header class="admin-header">
+            <div class="header-content">
+                <div class="brand-section">
+                    <h1>⚡ Admin Control Center</h1>
+                    <span class="system-status">System Online</span>
+                </div>
+                
+                <div class="header-actions">
+                    <div class="admin-info">
+                        <span class="admin-badge">Administrator</span>
+                        <span class="last-login">Last login: <span id="lastLoginTime"></span></span>
+                    </div>
+                    <button onclick="logoutAdmin()" class="btn-logout">Logout</button>
+                </div>
+            </div>
+        </header>
+
+        <div class="dashboard-container">
+            <aside class="sidebar">
+                <nav class="sidebar-nav">
+                    <a href="#" onclick="showSection('users')" class="nav-item active" data-section="users">
+                        <span class="nav-icon">👥</span>
+                        <span>User Management</span>
+                    </a>
+                    <a href="#" onclick="showSection('analytics')" class="nav-item" data-section="analytics">
+                        <span class="nav-icon">📊</span>
+                        <span>Analytics</span>
+                    </a>
+                    <a href="#" onclick="showSection('content')" class="nav-item" data-section="content">
+                        <span class="nav-icon">📚</span>
+                        <span>Content Management</span>
+                    </a>
+                    <a href="#" onclick="showSection('system')" class="nav-item" data-section="system">
+                        <span class="nav-icon">⚙️</span>
+                        <span>System Settings</span>
+                    </a>
+                </nav>
+            </aside>
+
+            <main class="main-content">
+                <!-- User Management Section -->
+                <section id="usersSection" class="dashboard-section active">
+                    <div class="section-header">
+                        <h2>User Management</h2>
+                        <div class="section-actions">
+                            <button onclick="refreshUserData()" class="btn-secondary">🔄 Refresh</button>
+                            <button onclick="exportUserData()" class="btn-secondary">📥 Export</button>
+                        </div>
+                    </div>
+
+                    <div class="stats-grid">
+                        <div class="stat-card">
+                            <div class="stat-icon">👤</div>
+                            <div class="stat-content">
+                                <div class="stat-number" id="totalUsers">0</div>
+                                <div class="stat-label">Total Users</div>
+                            </div>
+                        </div>
+                        
+                        <div class="stat-card">
+                            <div class="stat-icon">✅</div>
+                            <div class="stat-content">
+                                <div class="stat-number" id="verifiedUsers">0</div>
+                                <div class="stat-label">Verified Users</div>
+                            </div>
+                        </div>
+                        
+                        <div class="stat-card">
+                            <div class="stat-icon">📈</div>
+                            <div class="stat-content">
+                                <div class="stat-number" id="activeToday">0</div>
+                                <div class="stat-label">Active Today</div>
+                            </div>
+                        </div>
+                        
+                        <div class="stat-card">
+                            <div class="stat-icon">🏆</div>
+                            <div class="stat-content">
+                                <div class="stat-number" id="topRank">Bronze</div>
+                                <div class="stat-label">Highest Rank</div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="data-section">
+                        <div class="data-header">
+                            <h3>User Database</h3>
+                            <div class="search-controls">
+                                <input type="text" id="userSearch" placeholder="Search users..." class="search-input">
+                                <button onclick="searchUsers()" class="search-btn">🔍</button>
+                            </div>
+                        </div>
+
+                        <div class="table-container">
+                            <table class="data-table" id="usersTable">
+                                <thead>
+                                    <tr>
+                                        <th>Email</th>
+                                        <th>Registration Time</th>
+                                        <th>Status</th>
+                                        <th>Level</th>
+                                        <th>Rank</th>
+                                        <th>Actions</th>
+                                    </tr>
+                                </thead>
+                                <tbody id="usersTableBody">
+                                    <!-- Will be populated by JavaScript -->
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </section>
+
+                <!-- Analytics Section -->
+                <section id="analyticsSection" class="dashboard-section">
+                    <div class="section-header">
+                        <h2>Analytics Dashboard</h2>
+                        <div class="time-filter">
+                            <select id="timeRange" class="filter-select">
+                                <option value="today">Today</option>
+                                <option value="week">This Week</option>
+                                <option value="month">This Month</option>
+                                <option value="year">This Year</option>
+                            </select>
+                        </div>
+                    </div>
+
+                    <div class="analytics-grid">
+                        <div class="chart-card">
+                            <h3>User Registration Trend</h3>
+                            <div class="chart-placeholder">
+                                <div class="chart-bar" style="height: 60%"></div>
+                                <div class="chart-bar" style="height: 80%"></div>
+                                <div class="chart-bar" style="height: 45%"></div>
+                                <div class="chart-bar" style="height: 90%"></div>
+                                <div class="chart-bar" style="height: 70%"></div>
+                            </div>
+                        </div>
+
+                        <div class="chart-card">
+                            <h3>Learning Progress</h3>
+                            <div class="progress-stats">
+                                <div class="progress-item">
+                                    <span>Aksara Completion</span>
+                                    <div class="progress-bar">
+                                        <div class="progress-fill" style="width: 75%"></div>
+                                    </div>
+                                    <span>75%</span>
+                                </div>
+                                <div class="progress-item">
+                                    <span>Stage Completion</span>
+                                    <div class="progress-bar">
+                                        <div class="progress-fill" style="width: 60%"></div>
+                                    </div>
+                                    <span>60%</span>
+                                </div>
+                                <div class="progress-item">
+                                    <span>Dictionary Usage</span>
+                                    <div class="progress-bar">
+                                        <div class="progress-fill" style="width: 85%"></div>
+                                    </div>
+                                    <span>85%</span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </section>
+
+                <!-- Content Management Section -->
+                <section id="contentSection" class="dashboard-section">
+                    <div class="section-header">
+                        <h2>Content Management</h2>
+                        <button onclick="addNewContent()" class="btn-primary">+ Add Content</button>
+                    </div>
+
+                    <div class="content-grid">
+                        <div class="content-card">
+                            <h3>Dictionary Management</h3>
+                            <p>Manage Javanese-Indonesian word pairs</p>
+                            <div class="content-stats">
+                                <span>Total Words: 150</span>
+                                <span>Categories: 5</span>
+                            </div>
+                            <button class="btn-secondary">Manage Dictionary</button>
+                        </div>
+
+                        <div class="content-card">
+                            <h3>Stage Questions</h3>
+                            <p>Add and edit quiz questions for learning stages</p>
+                            <div class="content-stats">
+                                <span>Total Questions: 500</span>
+                                <span>Levels: 100</span>
+                            </div>
+                            <button class="btn-secondary">Manage Questions</button>
+                        </div>
+
+                        <div class="content-card">
+                            <h3>Aksara Library</h3>
+                            <p>Manage Javanese script characters and audio</p>
+                            <div class="content-stats">
+                                <span>Characters: 24</span>
+                                <span>Audio Files: 24</span>
+                            </div>
+                            <button class="btn-secondary">Manage Aksara</button>
+                        </div>
+                    </div>
+                </section>
+
+                <!-- System Settings Section -->
+                <section id="systemSection" class="dashboard-section">
+                    <div class="section-header">
+                        <h2>System Settings</h2>
+                        <div class="system-status-indicator">
+                            <span class="status-dot online"></span>
+                            <span>All Systems Operational</span>
+                        </div>
+                    </div>
+
+                    <div class="settings-grid">
+                        <div class="setting-card">
+                            <h3>Email Configuration</h3>
+                            <div class="setting-item">
+                                <label>SMTP Server</label>
+                                <input type="text" value="smtp.gmail.com" readonly class="setting-input">
+                            </div>
+                            <div class="setting-item">
+                                <label>From Email</label>
+                                <input type="email" value="jasondariuschandra@gmail.com" readonly class="setting-input">
+                            </div>
+                            <button onclick="testEmailService()" class="btn-secondary">Test Email</button>
+                        </div>
+
+                        <div class="setting-card">
+                            <h3>Security Settings</h3>
+                            <div class="setting-item">
+                                <label>Admin Password</label>
+                                <button onclick="changeAdminPassword()" class="btn-secondary">Change Password</button>
+                            </div>
+                            <div class="setting-item">
+                                <label>Session Timeout</label>
+                                <select class="setting-select">
+                                    <option>30 minutes</option>
+                                    <option>1 hour</option>
+                                    <option>2 hours</option>
+                                </select>
+                            </div>
+                        </div>
+
+                        <div class="setting-card">
+                            <h3>Database Management</h3>
+                            <div class="db-stats">
+                                <div class="db-stat">
+                                    <span>Database Size</span>
+                                    <span>2.4 MB</span>
+                                </div>
+                                <div class="db-stat">
+                                    <span>Last Backup</span>
+                                    <span>2 hours ago</span>
+                                </div>
+                            </div>
+                            <div class="db-actions">
+                                <button class="btn-secondary">Backup Now</button>
+                                <button class="btn-secondary">Optimize DB</button>
+                            </div>
+                        </div>
+                    </div>
+                </section>
+            </main>
+        </div>
+    </div>
+
+    <script src="/admin-script.js"></script>
+</body>
+</html>
