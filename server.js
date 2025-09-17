@@ -19,7 +19,7 @@ let dictionary = []
 const stages = []
 const leaderboard = []
 
-const transport = nodemailer.createTransport({
+const transporter = nodemailer.createTransport({
   service: "gmail",
   auth: {
     user: "jasondariuschandra@gmail.com",
