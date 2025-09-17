@@ -1,3 +1,5 @@
+const BASE_URL = process.env.BASE_URL || `http://localhost:${PORT}`
+
 const express = require("express")
 const bcrypt = require("bcryptjs")
 const jwt = require("jsonwebtoken")
@@ -19,7 +21,7 @@ let dictionary = []
 const stages = []
 const leaderboard = []
 
-const transporter = nodemailer.createTransport({
+const transport = nodemailer.createTransport({
   service: "gmail",
   auth: {
     user: "jasondariuschandra@gmail.com",
