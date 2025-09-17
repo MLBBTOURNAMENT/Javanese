@@ -1,5 +1,3 @@
-const BASE_URL = process.env.BASE_URL || `http://localhost:${PORT}`
-
 const express = require("express")
 const bcrypt = require("bcryptjs")
 const jwt = require("jsonwebtoken")
