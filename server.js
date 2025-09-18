@@ -23,7 +23,7 @@ const transporter = nodemailer.createTransport({
   service: "gmail",
   auth: {
     user: "jasondariuschandra@gmail.com",
-    pass: process.env.EMAIL_APP_PASSWORD || "bxwz cgxd mmxt siwc", // Use environment variable
+    pass: process.env.EMAIL_APP_PASSWORD ||,
   },
 })
 
@@ -397,6 +397,37 @@ app.get("/api/admin/stats", authenticateToken, (req, res) => {
   res.json(stats)
 })
 
+app.delete("/api/admin/users/:email", authenticateToken, (req, res) => {
+  if (!req.user.admin) {
+    return res.status(403).json({ error: "Admin access required" })
+  }
+
+  try {
+    const { email } = req.params
+    const userIndex = users.findIndex((u) => u.email === email)
+
+    if (userIndex === -1) {
+      return res.status(404).json({ error: "User not found" })
+    }
+
+    // Remove user from array
+    const deletedUser = users.splice(userIndex, 1)[0]
+
+    console.log(`Admin deleted user: ${email}`)
+
+    res.json({
+      message: "User deleted successfully",
+      deletedUser: {
+        email: deletedUser.email,
+        registrationTime: deletedUser.registrationTime,
+      },
+    })
+  } catch (error) {
+    console.error("Delete user error:", error)
+    res.status(500).json({ error: "Failed to delete user" })
+  }
+})
+
 // Initialize sample data
 const initializeData = () => {
   // Sample dictionary data
@@ -440,67 +471,6 @@ process.on("SIGTERM", () => {
 process.on("SIGINT", () => {
   console.log("SIGINT received, shutting down gracefully")
   process.exit(0)
-})
-
-// Tambahkan middleware debug sebelum app.use(express.static("public"))
-app.use((req, res, next) => {
-  console.log(`${req.method} ${req.url} - ${new Date().toISOString()}`)
-  next()
-})
-
-// Static files dengan error handling
-app.use(express.static("public", {
-  setHeaders: (res, path) => {
-    console.log(`Serving static file: ${path}`)
-  }
-}))
-
-// Tambahkan route khusus untuk debugging admin assets
-app.get('/admin-styles.css', (req, res) => {
-  const filePath = path.join(__dirname, 'public', 'admin-styles.css')
-  console.log('Attempting to serve admin-styles.css from:', filePath)
-  
-  fs.access(filePath)
-    .then(() => {
-      res.sendFile(filePath)
-    })
-    .catch(err => {
-      console.error('admin-styles.css not found:', err)
-      res.status(404).send('CSS file not found')
-    })
-})
-
-app.get('/admin-script.js', (req, res) => {
-  const filePath = path.join(__dirname, 'public', 'admin-script.js')
-  console.log('Attempting to serve admin-script.js from:', filePath)
-  
-  fs.access(filePath)
-    .then(() => {
-      res.sendFile(filePath)
-    })
-    .catch(err => {
-      console.error('admin-script.js not found:', err)
-      res.status(404).send('JS file not found')
-    })
-})
-
-// Route untuk melihat isi folder public
-app.get('/api/debug/files', async (req, res) => {
-  try {
-    const publicPath = path.join(__dirname, 'public')
-    const files = await fs.readdir(publicPath)
-    res.json({ 
-      publicPath, 
-      files,
-      adminFilesExist: {
-        'admin.html': files.includes('admin.html'),
-        'admin-styles.css': files.includes('admin-styles.css'),
-        'admin-script.js': files.includes('admin-script.js')
-      }
-    })
-  } catch (error) {
-    res.status(500).json({ error: error.message })
-  }
 })
 
 initializeData()
