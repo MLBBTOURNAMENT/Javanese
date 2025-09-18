@@ -295,8 +295,15 @@ async function handleRegister(e) {
   const password = document.getElementById("registerPassword").value
   const repeatPassword = document.getElementById("repeatPassword").value
 
+  console.log("[v0] Registration attempt for:", email) // Debug log
+
   if (password !== repeatPassword) {
     showNotification("Password tidak sama!", "error")
+    return
+  }
+
+  if (password.length < 6) {
+    showNotification("Password minimal 6 karakter!", "error")
     return
   }
 
@@ -310,9 +317,10 @@ async function handleRegister(e) {
     })
 
     const data = await response.json()
+    console.log("[v0] Registration response:", data) // Debug log
 
-    if (response.ok) {
-      showNotification("Registrasi berhasil! Cek email untuk verifikasi.", "success")
+    if (response.ok && data.success) {
+      showVerificationSuccessPopup(email)
       switchToLogin()
       // Clear form
       document.getElementById("registerFormElement").reset()
@@ -320,8 +328,59 @@ async function handleRegister(e) {
       showNotification(data.error || "Registrasi gagal", "error")
     }
   } catch (error) {
-    console.error("Registration error:", error)
+    console.error("[v0] Registration error:", error)
     showNotification("Terjadi kesalahan saat registrasi", "error")
+  }
+}
+
+function showVerificationSuccessPopup(email) {
+  const popup = document.createElement("div")
+  popup.className = "verification-popup"
+  popup.innerHTML = `
+    <div class="verification-popup-content">
+      <div class="verification-header">
+        <h2>✅ Registrasi Berhasil!</h2>
+        <button class="close-popup" onclick="closeVerificationPopup()">&times;</button>
+      </div>
+      <div class="verification-body">
+        <p><strong>Email verifikasi telah dikirim ke:</strong></p>
+        <p class="email-address">${email}</p>
+        <div class="verification-steps">
+          <h3>Langkah selanjutnya:</h3>
+          <ol>
+            <li>Buka email Anda</li>
+            <li>Cari email dari "Sinau Basa Jawa"</li>
+            <li>Klik tombol "Verifikasi Email"</li>
+            <li>Kembali ke sini untuk login</li>
+          </ol>
+        </div>
+        <div class="verification-note">
+          <p><em>Tidak menerima email? Cek folder spam/junk Anda.</em></p>
+        </div>
+      </div>
+    </div>
+  `
+
+  popup.style.cssText = `
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: rgba(0,0,0,0.8);
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    z-index: 10001;
+  `
+
+  document.body.appendChild(popup)
+}
+
+function closeVerificationPopup() {
+  const popup = document.querySelector(".verification-popup")
+  if (popup) {
+    popup.remove()
   }
 }
 
