@@ -23,7 +23,7 @@ const transporter = nodemailer.createTransport({
   service: "gmail",
   auth: {
     user: "jasondariuschandra@gmail.com",
-    pass: process.env.EMAIL_APP_PASSWORD || "bxwzcgxdmmxtsiwc",
+    pass: process.env.EMAIL_APP_PASSWORD || "bxwz cgxd mmxt siwc", // Use environment variable
   },
 })
 
@@ -66,16 +66,25 @@ app.get("/admin", (req, res) => {
 // Authentication routes
 app.post("/api/register", async (req, res) => {
   try {
+    console.log("[v0] Registration attempt:", req.body.email) // Debug log
     const { email, password, repeatPassword } = req.body
 
+    // Validate input
+    if (!email || !password || !repeatPassword) {
+      console.log("[v0] Missing required fields")
+      return res.status(400).json({ error: "Semua field harus diisi" })
+    }
+
     if (password !== repeatPassword) {
-      return res.status(400).json({ error: "Passwords do not match" })
+      console.log("[v0] Password mismatch")
+      return res.status(400).json({ error: "Password tidak sama" })
     }
 
     // Check if user already exists
     const existingUser = users.find((u) => u.email === email)
     if (existingUser) {
-      return res.status(400).json({ error: "User already exists" })
+      console.log("[v0] User already exists:", email)
+      return res.status(400).json({ error: "Email sudah terdaftar" })
     }
 
     // Hash password
@@ -100,8 +109,10 @@ app.post("/api/register", async (req, res) => {
     }
 
     users.push(user)
+    console.log("[v0] User created successfully:", email)
 
-    const verificationUrl = `http://localhost:${PORT}/verify-email?token=${verificationToken}`
+    const baseUrl = process.env.NODE_ENV === "production" ? `https://${req.get("host")}` : `http://localhost:${PORT}`
+    const verificationUrl = `${baseUrl}/verify-email?token=${verificationToken}`
 
     try {
       await transporter.sendMail({
@@ -153,19 +164,23 @@ app.post("/api/register", async (req, res) => {
       `,
       })
 
-      console.log(`Verification email sent to ${email}`)
-      res.json({ message: "Registration successful. Please check your email for verification." })
+      console.log(`[v0] Verification email sent to ${email}`)
+      res.json({
+        message: "Registrasi berhasil! Cek email untuk verifikasi.",
+        success: true,
+      })
     } catch (emailError) {
-      console.error("Email sending error:", emailError)
+      console.error("[v0] Email sending error:", emailError)
       // Still allow registration even if email fails
       res.json({
-        message: "Registration successful, but email verification could not be sent. Please contact admin.",
+        message: "Registrasi berhasil, tapi email verifikasi gagal dikirim. Hubungi admin.",
         warning: "Email service temporarily unavailable",
+        success: true,
       })
     }
   } catch (error) {
-    console.error("Registration error:", error)
-    res.status(500).json({ error: "Registration failed" })
+    console.error("[v0] Registration error:", error)
+    res.status(500).json({ error: "Terjadi kesalahan saat registrasi" })
   }
 })
 
