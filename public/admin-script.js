@@ -337,9 +337,38 @@ function editUser(email) {
   showNotification("Edit user functionality coming soon", "info")
 }
 
-function deleteUser(email) {
-  if (confirm(`Are you sure you want to delete user: ${email}?`)) {
-    showNotification("Delete user functionality coming soon", "info")
+async function deleteUser(email) {
+  if (
+    !confirm(
+      `Are you sure you want to permanently delete user: ${email}?\n\nThis action cannot be undone and will remove all user data including:\n- Account information\n- Learning progress\n- Points and achievements\n- Completed stages`,
+    )
+  ) {
+    return
+  }
+
+  try {
+    showNotification("Deleting user...", "info")
+
+    const response = await fetch(`/api/admin/users/${encodeURIComponent(email)}`, {
+      method: "DELETE",
+      headers: {
+        Authorization: `Bearer ${adminToken}`,
+        "Content-Type": "application/json",
+      },
+    })
+
+    const data = await response.json()
+
+    if (response.ok) {
+      showNotification(`User ${email} deleted successfully`, "success")
+      // Refresh the users table to reflect the deletion
+      await loadUsersData()
+    } else {
+      showNotification(`Failed to delete user: ${data.error}`, "error")
+    }
+  } catch (error) {
+    console.error("Delete user error:", error)
+    showNotification("Failed to delete user. Please try again.", "error")
   }
 }
 
